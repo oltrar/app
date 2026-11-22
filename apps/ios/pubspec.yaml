@@ -1,7 +1,7 @@
 name: loopmate
-description: LoopMate iOS in-app gesture preview.
+description: LoopMate iOS in-app browser action repeater.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  webview_flutter: ^4.7.0
 
 dev_dependencies:
   flutter_test:

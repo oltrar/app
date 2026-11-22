@@ -193,6 +193,7 @@ class _RepeaterScreenState extends State<RepeaterScreen> {
         setState(() {
           _running = running;
           _count = count;
+          _error = state['error'] as String?;
         });
         if (!running) _statusTimer?.cancel();
       } on PlatformException catch (error) {
@@ -271,7 +272,7 @@ class _RepeaterScreenState extends State<RepeaterScreen> {
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<RepeatAction>(
-                      value: _action,
+                      initialValue: _action,
                       isExpanded: true,
                       items: RepeatAction.values
                           .map((item) => DropdownMenuItem(

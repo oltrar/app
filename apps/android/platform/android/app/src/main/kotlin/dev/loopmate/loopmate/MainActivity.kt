@@ -10,6 +10,8 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     companion object {
         private const val CHANNEL = "dev.loopmate.loopmate/automation"
+        private val ACTIONS =
+            setOf("tap", "swipe_up", "swipe_down", "swipe_left", "swipe_right")
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -41,8 +43,9 @@ class MainActivity : FlutterActivity() {
                         val yPercent = call.argument<Number>("yPercent")?.toFloat() ?: 50f
                         val repeatCount = call.argument<Int>("repeatCount") ?: 0
 
-                        if (intervalSeconds < 1 || repeatCount < 0 ||
-                            xPercent !in 0f..100f || yPercent !in 0f..100f
+                        if (action !in ACTIONS || intervalSeconds < 1 ||
+                            repeatCount < 0 || xPercent !in 0f..100f ||
+                            yPercent !in 0f..100f
                         ) {
                             result.error("INVALID_CONFIG", "The repeat configuration is invalid.", null)
                             return@setMethodCallHandler
@@ -77,7 +80,8 @@ class MainActivity : FlutterActivity() {
                         result.success(
                             mapOf(
                                 "running" to (service?.isLoopRunning() ?: false),
-                                "count" to (service?.getExecutionCount() ?: 0)
+                                "count" to (service?.getExecutionCount() ?: 0),
+                                "error" to service?.getLastError()
                             )
                         )
                     }
