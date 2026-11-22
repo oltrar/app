@@ -1,0 +1,33 @@
+{
+  "activePreset": "scroll_safari",
+  "presets": [
+    {
+      "id": "scroll_safari",
+      "name": "Swipe up in Safari every 10 seconds",
+      "bundleId": "com.apple.mobilesafari",
+      "repeatCount": 3,
+      "steps": [
+        {
+          "action": "swipe_up",
+          "waitMs": 10000,
+          "xPercent": 50,
+          "yPercent": 50
+        }
+      ]
+    },
+    {
+      "id": "tap_example",
+      "name": "Tap example",
+      "bundleId": "com.apple.mobilesafari",
+      "repeatCount": 3,
+      "steps": [
+        {
+          "action": "tap",
+          "waitMs": 10000,
+          "xPercent": 50,
+          "yPercent": 60
+        }
+      ]
+    }
+  ]
+}

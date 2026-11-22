@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.app.AlertDialog
+import org.json.JSONObject
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -33,6 +35,7 @@ class MainActivity : Activity() {
     private lateinit var limit: EditText
     private lateinit var x: EditText
     private lateinit var y: EditText
+    private val presets by lazy { getSharedPreferences("loopmate_presets", MODE_PRIVATE) }
     private val handler = Handler(Looper.getMainLooper())
 
     private val update = object : Runnable {
@@ -74,6 +77,16 @@ class MainActivity : Activity() {
         y = entry(root, "50", "Tap Y position (0-100%)")
 
         Button(this).apply {
+            text = "Save preset"
+            setOnClickListener { savePreset() }
+            root.addView(this)
+        }
+        Button(this).apply {
+            text = "Load preset"
+            setOnClickListener { loadPreset() }
+            root.addView(this)
+        }
+        Button(this).apply {
             text = "Enable accessibility permission"
             setOnClickListener { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
             root.addView(this)
@@ -108,6 +121,54 @@ class MainActivity : Activity() {
             )
             root.addView(it)
         }
+    }
+
+    private fun savePreset() {
+        val input = EditText(this).apply {
+            hint = "Preset name"
+            setSingleLine()
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Save preset")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isBlank()) {
+                    Toast.makeText(this, "Enter a name", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val entry = JSONObject()
+                    .put("action", action.selectedItemPosition)
+                    .put("interval", interval.text.toString())
+                    .put("limit", limit.text.toString())
+                    .put("x", x.text.toString())
+                    .put("y", y.text.toString())
+                presets.edit().putString("preset:$name", entry.toString()).apply()
+                Toast.makeText(this, "Preset saved", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun loadPreset() {
+        val names = presets.all.keys.filter { it.startsWith("preset:") }
+            .sorted().map { it.removePrefix("preset:") }
+        if (names.isEmpty()) {
+            Toast.makeText(this, "No saved presets yet", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Load preset")
+            .setItems(names.toTypedArray()) { _, which ->
+                val data = JSONObject(presets.getString("preset:${names[which]}", "{}") ?: "{}")
+                action.setSelection(data.optInt("action", 1).coerceIn(0, choices.lastIndex))
+                interval.setText(data.optString("interval", "10"))
+                limit.setText(data.optString("limit", "0"))
+                x.setText(data.optString("x", "50"))
+                y.setText(data.optString("y", "50"))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun enabled(): Boolean {

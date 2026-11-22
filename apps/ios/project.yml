@@ -23,8 +23,27 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.loopmate.ios
         GENERATE_INFOPLIST_FILE: "NO"
+  LoopMateUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests
+        excludes:
+          - presets.json
+      - path: Tests/presets.json
+        buildPhase: resources
+    dependencies:
+      - target: LoopMate
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.loopmate.ios.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
 schemes:
   LoopMate:
     build:
       targets:
         LoopMate: all
+        LoopMateUITests: [test]
+    test:
+      targets:
+        - LoopMateUITests
