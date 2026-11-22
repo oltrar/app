@@ -1,28 +1,23 @@
-# LoopMate
+# LoopMate — setup
 
-## iOS — macOS, Xcode, Flutter
+## iOS (macOS + Xcode)
 
 ```bash
 git clone https://github.com/oltrar/app.git
 cd app/apps/ios
-bash tool/bootstrap.sh
-open -a Simulator
-flutter run
-# For a signed iPhone build, select a Development Team in ios/Runner.xcworkspace:
-open ios/Runner.xcworkspace
-flutter build ios --release
+brew install xcodegen
+xcodegen generate
+open LoopMate.xcodeproj
+# Select your team in Xcode → LoopMate target → Signing & Capabilities.
+# Choose an iPhone or simulator and press Run.
 ```
 
-Open the offline demo, choose an action and interval, and press **Start**. To automate a website, enter its HTTPS URL and tap **Go**. iOS actions work **inside the app's browser only**, while foregrounded—not across other apps.
-
-## Android — Flutter, Android SDK
+## Android (JDK 17 + Android SDK + Gradle 8.10.2)
 
 ```bash
 git clone https://github.com/oltrar/app.git
 cd app/apps/android
-bash tool/bootstrap.sh
-flutter run
-flutter build apk --release
+gradle assembleDebug
+adb install app/build/outputs/apk/debug/app-debug.apk
+# On device: Settings → Accessibility → LoopMate actions → Enable
 ```
-
-Enable **LoopMate** in Android **Settings → Accessibility**, then return to the app and press **Start**.

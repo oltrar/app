@@ -1,4 +1,4 @@
-name: Build and test
+name: Build iOS and Android
 
 on:
   pull_request:
@@ -10,16 +10,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-      - run: bash tool/bootstrap.sh
+      - run: brew install xcodegen
+      - name: Generate iOS project
         working-directory: apps/ios
-      - run: flutter test
+        run: xcodegen generate
+      - name: Build for iOS Simulator
         working-directory: apps/ios
-      - run: flutter build ios --simulator --no-codesign
-        working-directory: apps/ios
+        run: |
+          xcodebuild -project LoopMate.xcodeproj -scheme LoopMate             -configuration Debug -sdk iphonesimulator             -destination 'generic/platform=iOS Simulator'             CODE_SIGNING_ALLOWED=NO build
 
   android:
     runs-on: ubuntu-latest
@@ -29,13 +27,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: subosito/flutter-action@v2
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 35
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          channel: stable
-          cache: true
-      - run: bash tool/bootstrap.sh
+          gradle-version: '8.10.2'
+      - name: Build Android debug APK
         working-directory: apps/android
-      - run: flutter analyze
-        working-directory: apps/android
-      - run: flutter build apk --debug
-        working-directory: apps/android
+        run: gradle assembleDebug --no-daemon
